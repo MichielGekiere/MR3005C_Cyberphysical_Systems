@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="tf_examples" type="tf_act" name="RVIZ_marker" output="screen"/>
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find tf_examples)/rviz/tf_act.rviz"/>
+</launch>
