@@ -1,6 +1,23 @@
 <?xml version="1.0" ?>
 <launch>
-    <node name="signal_generator" pkg="courseworks" type="signal_generator" output="screen" launch-prefix="gnome-terminal --command" />
-    <node name="process" pkg="courseworks" type="process" output="screen" launch-prefix="gnome-terminal --command" />
-    <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot" output="screen" args="/signal /proc_signal"/>
+    <!-- Load all params from YAML onto the param server.
+         Nested keys become /global_offset, /Group1/group_offset,
+         /Group1/process/node_offset, etc. C++ NodeHandles are unchanged. -->
+    <rosparam file="$(find courseworks)/config/cw1.yaml" command="load"/>
+
+    <group ns="Group1">
+        <node name="signal_generator" pkg="courseworks" type="signal_generator" output="screen" launch-prefix="gnome-terminal --command"/>
+
+        <node name="process" pkg="courseworks" type="process" output="screen" launch-prefix="gnome-terminal --command"/>
+
+        <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot" output="screen" args="/signal /proc_signal"/>
+    </group>
+
+    <group ns="Group2">
+        <node name="signal_generator" pkg="courseworks" type="signal_generator" output="screen" launch-prefix="gnome-terminal --command"/>
+
+        <node name="process" pkg="courseworks" type="process" output="screen" launch-prefix="gnome-terminal --command"/>
+
+        <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot" output="screen" args="/signal /proc_signal"/>
+    </group>
 </launch>

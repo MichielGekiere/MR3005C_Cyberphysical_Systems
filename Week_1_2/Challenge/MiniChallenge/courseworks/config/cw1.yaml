@@ -1,0 +1,24 @@
+# Loaded at launch-file root, so nested keys match the param server paths.
+# 1. Global:  /global_offset
+# 2. Group:   /Group1/group_offset, /Group2/group_offset
+# 3. Private: /Group1/process/..., /Group2/process/...
+
+global_offset: 1.0
+
+Group1:
+  group_offset: 1.0
+  signal_generator:
+    time_step: 0.1
+  process:
+    node_offset: 1.0
+    phase: 1.5707963
+    amplitude_reduction: 0.5
+
+Group2:
+  group_offset: 2.0
+  signal_generator:
+    time_step: 0.1
+  process:
+    node_offset: 2.0
+    phase: 1.5707963
+    amplitude_reduction: 0.5
