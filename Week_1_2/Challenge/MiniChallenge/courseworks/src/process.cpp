@@ -1,56 +1,57 @@
-#include <cmath>
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
+#include <cmath>
 
-namespace
-{
-const float kOffset = 1.0f;          // α so sin(t)+α stays >= 0
-const float kPhase = 1.5707963f;     // φ = π/2, hardcoded as allowed
-}
-
-float g_signal = 0.0f;
-float g_time = 0.0f;
-bool g_got_signal = false;
-bool g_got_time = false;
+float signal_data = 0.0;
+float time_data = 0.0;
+bool got_signal = false;
+bool got_time = false;
 
 void signalCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-  g_signal = msg->data;
-  g_got_signal = true;
+  signal_data = msg->data;
+  got_signal = true;
 }
 
 void timeCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-  g_time = msg->data;
-  g_got_time = true;
+  time_data = msg->data;
+  got_time = true;
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "process");
-  ros::NodeHandle nh;
+  float offset = 1.0;
+  float shift = M_PI / 2.0;
+  float amplitude_reduction = 0.5;
 
-  ros::Subscriber signal_sub = nh.subscribe("/signal", 10, signalCallback);
-  ros::Subscriber time_sub = nh.subscribe("/time", 10, timeCallback);
-  ros::Publisher proc_pub = nh.advertise<std_msgs::Float32>("/proc_signal", 10);
+  ros::init(argc, argv, "process");
+  ros::NodeHandle nodehandle;
+
+  ros::Subscriber signal_sub = nodehandle.subscribe("/signal", 10, signalCallback);
+  ros::Subscriber time_sub = nodehandle.subscribe("/time", 10, timeCallback);
+
+  ros::Publisher proc_pub = nodehandle.advertise<std_msgs::Float32>("/proc_signal", 10);
+
   ros::Rate rate(10);
 
   while (ros::ok())
   {
     ros::spinOnce();
 
-    if (g_got_signal && g_got_time)
+    if (got_signal && got_time)
     {
-      // sin(t+φ) = sin(t)cos(φ) + cos(t)sin(φ)
-      const float shifted = g_signal * std::cos(kPhase)
-                          + std::cos(g_time) * std::sin(kPhase);
-      const float processed = 0.5f * (shifted + kOffset);
+      float shifted = signal_data * cos(shift) + cos(time_data) * sin(shift);
 
-      std_msgs::Float32 msg;
-      msg.data = processed;
-      proc_pub.publish(msg);
+      float offset_wave = shifted + offset;
 
-      ROS_INFO("proc_signal = %.3f", processed);
+      float processed = amplitude_reduction * offset_wave;
+
+      std_msgs::Float32 proc_msg;
+      proc_msg.data = processed;
+      proc_pub.publish(proc_msg);
+
+      ROS_INFO("proc_signal => %.3f", processed);
     }
 
     rate.sleep();
