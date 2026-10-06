@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+  <param name="r" value="0.05"/>
+  <param name="d_wheels" value="0.19"/>
+
+  <node name="odom" pkg="odom" type="odom.py" output="screen"/>
+
+</launch>
